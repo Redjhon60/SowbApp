@@ -1,0 +1,84 @@
+{
+  "name": "school-manager-pro",
+  "version": "1.0.0",
+  "description": "School Manager Pro - Système de Gestion Scolaire",
+  "main": "electron/main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "react-start": "react-scripts start",
+    "react-build": "react-scripts build",
+    "electron-dev": "electron .",
+    "build": "npm run react-build && electron-builder",
+    "build:win": "npm run react-build && electron-builder --win --x64",
+    "postinstall": "electron-builder install-app-deps && npx prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.7.0",
+    "better-sqlite3": "^9.4.3",
+    "chart.js": "^4.4.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-router-dom": "^6.21.1",
+    "react-scripts": "5.0.1",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.1",
+    "qrcode": "^1.5.3",
+    "date-fns": "^3.1.0",
+    "lucide-react": "^0.303.0",
+    "clsx": "^2.1.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "wait-on": "^7.2.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "prisma": "^5.7.0"
+  },
+  "build": {
+    "appId": "ma.leschema.schoolmanagerpro",
+    "productName": "School Manager Pro",
+    "copyright": "© 2026 Le Schéma",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "electron/**/*",
+      "prisma/**/*",
+      "node_modules/**/*",
+      "public/logo.jpeg"
+    ],
+    "extraResources": [
+      {
+        "from": "prisma",
+        "to": "prisma"
+      },
+      {
+        "from": "public/logo.jpeg",
+        "to": "logo.jpeg"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "public/icon.ico"
+    },
+    "portable": {
+      "artifactName": "SchoolManagerPro-Portable.exe"
+    }
+  },
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+  }
+}

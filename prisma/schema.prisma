@@ -1,0 +1,171 @@
+// Prisma Schema - School Manager Pro
+// Database: SQLite (offline-first)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  role      String   // admin, comptable, secretaire
+  name      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Student {
+  id               Int       @id @default(autoincrement())
+  code             String    @unique
+  firstName        String
+  lastName         String
+  photo            String?
+  gender           String    // M, F
+  dateOfBirth      DateTime?
+  address          String?
+  parentName       String
+  parentPhone      String
+  emergencyPhone   String?
+  classId          Int
+  class            Class     @relation(fields: [classId], references: [id])
+  registrationDate DateTime  @default(now())
+  hasTransport     Boolean   @default(false)
+  insurancePaid    Boolean   @default(false)
+  monthlyFee       Float     @default(0)
+  transportFee     Float     @default(0)
+  insuranceFee     Float     @default(0)
+  notes            String?
+  active           Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  payments         Payment[]
+  documents        Document[]
+}
+
+model Class {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  level     String
+  students  Student[]
+  schedules Schedule[]
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  receiptNumber String   @unique
+  studentId     Int
+  student       Student  @relation(fields: [studentId], references: [id])
+  type          String   // mensualite, assurance, transport, autre
+  month         String?  // e.g., "2026-01"
+  amount        Float
+  amountPaid    Float
+  remaining     Float    @default(0)
+  paymentDate   DateTime @default(now())
+  paymentMethod String   @default("especes") // especes, cheque, virement
+  notes         String?
+  receiptPdf    String?  // path to PDF
+  createdAt     DateTime @default(now())
+}
+
+model Employee {
+  id          Int        @id @default(autoincrement())
+  name        String
+  cin         String     @unique
+  phone       String
+  address     String?
+  role        String     // professeur, administratif, technicien, chauffeur
+  salary      Float
+  hiringDate  DateTime
+  active      Boolean    @default(true)
+  notes       String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  salaries    Salary[]
+}
+
+model Salary {
+  id           Int      @id @default(autoincrement())
+  employeeId   Int
+  employee     Employee @relation(fields: [employeeId], references: [id])
+  month        String   // e.g., "2026-01"
+  baseSalary   Float
+  bonus        Float    @default(0)
+  advance      Float    @default(0)
+  netSalary    Float
+  paidDate     DateTime?
+  isPaid       Boolean  @default(false)
+  notes        String?
+  createdAt    DateTime @default(now())
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  title       String
+  amount      Float
+  date        DateTime
+  category    String   // fixe, variable
+  subcategory String?  // loyer, electricite, eau, internet, salaires, reparations, fournitures, activites, autre
+  description String?
+  receipt     String?  // path to receipt image/pdf
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Bus {
+  id           Int    @id @default(autoincrement())
+  name         String
+  plateNumber  String @unique
+  capacity     Int
+  driverId     Int?
+  route        String?
+  active       Boolean @default(true)
+  createdAt    DateTime @default(now())
+}
+
+model Schedule {
+  id        Int    @id @default(autoincrement())
+  classId   Int
+  class     Class  @relation(fields: [classId], references: [id])
+  day       String // Lundi, Mardi, ...
+  startTime String // HH:MM
+  endTime   String // HH:MM
+  subject   String
+  teacher   String
+  room      String?
+}
+
+model Document {
+  id          Int      @id @default(autoincrement())
+  studentId   Int?
+  student     Student? @relation(fields: [studentId], references: [id])
+  title       String
+  type        String   // contrat, certificat, cin, recu, rapport, autre
+  filePath    String
+  fileSize    Int?
+  mimeType    String?
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model Backup {
+  id          Int      @id @default(autoincrement())
+  filename    String
+  filePath    String
+  size        Int?
+  type        String   @default("auto") // auto, manual
+  createdAt   DateTime @default(now())
+}
